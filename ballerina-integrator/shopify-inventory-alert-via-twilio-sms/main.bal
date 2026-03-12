@@ -5,12 +5,14 @@ import ballerina/lang.runtime;
 map<AlertCooldown> cooldownTracker = {};
 
 public function main() returns error? {
+    int recipientCount = twilioRecipientNumbers.length();
     io:println("Starting Shopify Inventory Monitor | threshold=" + inventoryThreshold.toString() +
         " pollingInterval=" + pollingIntervalSeconds.toString() +
         " cooldownPeriod=" + cooldownPeriodHours.toString() +
-        " recipients=" + twilioRecipientNumbers.length().toString());
+        " recipients=" + recipientCount.toString());
 
-    if productIdsToMonitor.length() > 0 {
+    int productIdCount = productIdsToMonitor.length();
+    if productIdCount > 0 {
         io:println("Monitoring specific product IDs: " + productIdsToMonitor.toString());
     } else {
         io:println("Monitoring all products");
@@ -19,13 +21,14 @@ public function main() returns error? {
     while true {
         error? result = checkAndNotifyInventory();
         if result is error {
-            var detail = result.detail();
-            if detail is map<anydata> && detail["statusCode"] == 401 {
+            var errorDetail = result.detail();
+            if errorDetail["statusCode"] == 401 {
                 io:println("ERROR: Shopify authentication failed: invalid API key or access token. " +
                     "Verify your shopifyAccessToken configuration and redeploy.");
                 return;
             }
-            io:println("ERROR: Error checking inventory: " + result.message());
+            string errorMessage = result.message();
+            io:println("ERROR: Error checking inventory: " + errorMessage);
         }
 
         // Wait for the next polling interval
