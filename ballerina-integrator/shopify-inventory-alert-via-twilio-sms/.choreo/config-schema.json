@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "wso2": {
+      "type": "object",
+      "properties": {
+        "shopify_inventory_alert_via_twilio_sms": {
+          "type": "object",
+          "properties": {
+            "shopifyStoreUrl": {
+              "type": "string",
+              "description": ""
+            },
+            "shopifyAccessToken": {
+              "type": "string",
+              "description": ""
+            },
+            "twilioAccountSid": {
+              "type": "string",
+              "description": ""
+            },
+            "twilioAuthToken": {
+              "type": "string",
+              "description": ""
+            },
+            "twilioFromNumber": {
+              "type": "string",
+              "description": ""
+            },
+            "twilioRecipientNumbers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": ""
+            },
+            "inventoryThreshold": {
+              "type": "integer",
+              "description": ""
+            },
+            "pollingIntervalSeconds": {
+              "type": "number",
+              "description": ""
+            },
+            "productIdsToMonitor": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              },
+              "description": ""
+            },
+            "collectionsToMonitor": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": ""
+            },
+            "smsTemplate": {
+              "type": "string",
+              "description": ""
+            },
+            "cooldownPeriodHours": {
+              "type": "number",
+              "description": ""
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "shopifyStoreUrl",
+            "shopifyAccessToken",
+            "twilioAccountSid",
+            "twilioAuthToken",
+            "twilioFromNumber",
+            "twilioRecipientNumbers"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
