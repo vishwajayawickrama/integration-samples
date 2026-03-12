@@ -1,3 +1,4 @@
+import ballerina/io;
 import ballerina/time;
 import ballerinax/shopify.admin;
 import ballerinax/twilio;
@@ -123,5 +124,49 @@ function sendInventoryAlert(ProductInventoryInfo productInfo) returns error? {
         };
 
         twilio:Message _ = check twilioClient->createMessage(messageRequest);
+    }
+}
+
+function checkAndNotifyInventory() returns error? {
+    // Fetch products from Shopify
+    Product[] allProducts = check getShopifyProducts();
+
+    // Filter products based on configuration
+    Product[] productsToCheck = filterProducts(allProducts);
+
+    // Check inventory levels
+    map<ProductInventoryInfo> lowInventoryProducts = checkInventoryLevels(productsToCheck);
+
+    if lowInventoryProducts.length() == 0 {
+        return;
+    }
+
+    io:println("WARN: Products with low inventory detected: " + lowInventoryProducts.length().toString());
+
+    // Send alerts for products that have passed cooldown period
+    foreach string sku in lowInventoryProducts.keys() {
+        ProductInventoryInfo productInfo = lowInventoryProducts.get(sku);
+
+        // Check if cooldown period has expired
+        if !isCooldownExpired(sku, cooldownTracker) {
+            continue;
+        }
+
+        // Send SMS alert to all recipients
+        io:println("Sending inventory alert | product=\"" + productInfo.productName +
+            "\" sku=" + sku + " inventory=" + productInfo.inventory.toString());
+        error? sendResult = sendInventoryAlert(productInfo);
+
+        if sendResult is error {
+            io:println("ERROR: Failed to send alert for \"" + productInfo.productName + "\": " + sendResult.message());
+        } else {
+            io:println("Alert sent successfully to " + twilioRecipientNumbers.length().toString() + " recipient(s)");
+
+            // Update cooldown tracker
+            cooldownTracker[sku] = {
+                lastAlertTime: time:monotonicNow(),
+                inventory: productInfo.inventory
+            };
+        }
     }
 }
