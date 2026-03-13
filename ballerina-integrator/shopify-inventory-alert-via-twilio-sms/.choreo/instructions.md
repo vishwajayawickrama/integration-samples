@@ -18,8 +18,6 @@
     - Click **Create an app** and give it a name (e.g., `Inventory Monitor`)
     - Under the **Configuration** tab, click **Configure Admin API scopes** and enable:
         - `read_products`
-        - `read_inventory`
-        - `read_locations`
     - Go to the **API credentials** tab and click **Install app**
     - Copy the **Admin API access token** — this is your `shopifyAccessToken`
     - > **Note:** The token is shown only once. Store it securely.

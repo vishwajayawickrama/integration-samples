@@ -21,8 +21,6 @@ Before running this integration, you need:
 1. A Shopify store with Admin API access
 2. A Shopify Admin API access token with the following scopes:
    - `read_products`
-   - `read_inventory`
-   - `read_locations`
 3. Your store's permanent `.myshopify.com` domain
 
 To create a new app and obtain an access token, follow the [Shopify Admin API getting started guide](https://shopify.dev/docs/apps/build/authentication-authorization/access-token-types/generate-app-access-tokens-admin).
