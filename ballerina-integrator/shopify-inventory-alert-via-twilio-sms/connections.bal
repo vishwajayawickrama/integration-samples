@@ -4,12 +4,12 @@ import ballerinax/twilio;
 // Twilio client
 final twilio:Client twilioClient = check new ({
     auth: {
-        accountSid: twilioAccountSid,
-        authToken: twilioAuthToken
+        accountSid: twilioConfig.accountSid,
+        authToken: twilioConfig.authToken
     }
 });
 
 // Shopify admin client
 final admin:Client adminClient = check new ({
-    xShopifyAccessToken: shopifyAccessToken
-}, shopifyStoreUrl);
+    xShopifyAccessToken: shopifyConfig.accessToken
+}, shopifyConfig.storeUrl);

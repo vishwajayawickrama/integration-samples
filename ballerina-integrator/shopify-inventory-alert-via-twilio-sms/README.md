@@ -37,15 +37,15 @@ The following configurations are required to connect to Shopify and Twilio.
 
 ### Shopify Credentials
 
-- `shopifyStoreUrl` - Your store URL (e.g., `https://your-store.myshopify.com`)
-- `shopifyAccessToken` - Admin API access token (`shpat_...`)
+- `storeUrl` - Your store URL (e.g., `https://your-store.myshopify.com`)
+- `accessToken` - Admin API access token (`shpat_...`)
 
 ### Twilio Credentials
 
-- `twilioAccountSid` - Your Twilio Account SID (`AC...`)
-- `twilioAuthToken` - Your Twilio Auth Token
-- `twilioFromNumber` - Your Twilio phone number in E.164 format (e.g., `+12025551234`)
-- `twilioRecipientNumbers` - One or more recipient phone numbers in E.164 format
+- `accountSid` - Your Twilio Account SID (`AC...`)
+- `authToken` - Your Twilio Auth Token
+- `fromNumber` - Your Twilio phone number in E.164 format (e.g., `+12025551234`)
+- `recipientNumbers` - One or more recipient phone numbers in E.164 format
 
 ### Inventory Monitoring
 

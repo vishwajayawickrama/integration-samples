@@ -6,4 +6,4 @@ title = "shopify-inventory-alert-via-twilio-sms"
 distribution = "2201.13.1"
 
 [build-options]
-sticky = true
+sticky = false

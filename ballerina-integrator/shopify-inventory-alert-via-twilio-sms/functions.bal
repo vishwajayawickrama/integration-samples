@@ -4,39 +4,56 @@ import ballerinax/shopify.admin;
 import ballerinax/twilio;
 
 // Function to fetch products from Shopify
+// Paginates using limit=250 and sinceId until a page returns fewer than 250 products.
 function getShopifyProducts() returns Product[]|error {
-    admin:ProductList response = check adminClient->getProducts();
-    anydata productsData = response["products"];
-    if productsData is () {
-        return [];
-    }
-    admin:Product[] adminProducts = check productsData.cloneWithType();
-
     Product[] products = [];
-    foreach admin:Product adminProduct in adminProducts {
-        int productId = adminProduct?.id ?: 0;
-        string productTitle = adminProduct?.title ?: "";
-        string? productVendor = adminProduct?.vendor;
+    int pageLimit = 250;
+    string? sinceId = ();
 
-        ProductVariant[] variants = [];
-        admin:ProductVariant[]? adminVariants = adminProduct?.variants;
-        if adminVariants is admin:ProductVariant[] {
-            foreach admin:ProductVariant adminVariant in adminVariants {
-                int variantId = adminVariant?.id ?: 0;
-                string variantTitle = adminVariant?.title ?: "";
-                int? inventoryQty = adminVariant?.inventory_quantity;
-                string? variantSku = adminVariant?.sku;
-                
-                variants.push({
-                    id: variantId,
-                    title: variantTitle,
-                    inventory_quantity: inventoryQty,
-                    sku: variantSku
-                });
-            }
+    while true {
+        admin:ProductList response = check adminClient->getProducts('limit = pageLimit, sinceId = sinceId);
+        anydata productsData = response["products"];
+        if productsData is () {
+            break;
+        }
+        admin:Product[] adminProducts = check productsData.cloneWithType();
+        if adminProducts.length() == 0 {
+            break;
         }
 
-        products.push({id: productId, title: productTitle, vendor: productVendor, variants: variants});
+        foreach admin:Product adminProduct in adminProducts {
+            int productId = adminProduct?.id ?: 0;
+            string productTitle = adminProduct?.title ?: "";
+            string? productVendor = adminProduct?.vendor;
+
+            ProductVariant[] variants = [];
+            admin:ProductVariant[]? adminVariants = adminProduct?.variants;
+            if adminVariants is admin:ProductVariant[] {
+                foreach admin:ProductVariant adminVariant in adminVariants {
+                    int variantId = adminVariant?.id ?: 0;
+                    string variantTitle = adminVariant?.title ?: "";
+                    int? inventoryQty = adminVariant?.inventory_quantity;
+                    string? variantSku = adminVariant?.sku;
+
+                    variants.push({
+                        id: variantId,
+                        title: variantTitle,
+                        inventory_quantity: inventoryQty,
+                        sku: variantSku
+                    });
+                }
+            }
+
+            products.push({id: productId, title: productTitle, vendor: productVendor, variants: variants});
+        }
+
+        if adminProducts.length() < pageLimit {
+            break;
+        }
+
+        // Use the last product's id as sinceId for the next page
+        int lastId = adminProducts[adminProducts.length() - 1]?.id ?: 0;
+        sinceId = lastId.toString();
     }
 
     return products;
@@ -70,7 +87,7 @@ function checkInventoryLevels(Product[] products) returns map<ProductInventoryIn
                 string skuValue = variantSku is string ? variantSku : "";
                 string productTitle = product.title;
                 string variantTitle = variant.title;
-                string productKey = skuValue != "" ? skuValue : string `${productTitle} - ${variantTitle}`;
+                string productKey = variant.id.toString();
 
                 lowInventoryProducts[productKey] = {
                     productId: product.id,
@@ -119,19 +136,31 @@ function formatSmsMessage(ProductInventoryInfo productInfo) returns string {
     return message;
 }
 
-// Function to send SMS via Twilio to multiple recipients
-function sendInventoryAlert(ProductInventoryInfo productInfo) returns error? {
+// Function to send SMS via Twilio to multiple recipients.
+// Iterates all twilioRecipientNumbers without fail-fast: each createMessage call is made
+// independently so a failure for one recipient does not abort delivery to the rest.
+// Returns a per-recipient result array so the caller can track cooldown/delivery state
+// per recipient and retry only failed ones.
+function sendInventoryAlert(ProductInventoryInfo productInfo) returns RecipientDeliveryResult[] {
     string messageBody = formatSmsMessage(productInfo);
+    RecipientDeliveryResult[] results = [];
 
-    foreach string recipientNumber in twilioRecipientNumbers {
+    foreach string recipientNumber in twilioConfig.recipientNumbers {
         twilio:CreateMessageRequest messageRequest = {
             To: recipientNumber,
-            From: twilioFromNumber,
+            From: twilioConfig.fromNumber,
             Body: messageBody
         };
 
-        twilio:Message _ = check twilioClient->createMessage(messageRequest);
+        twilio:Message|error sendResult = twilioClient->createMessage(messageRequest);
+        if sendResult is error {
+            results.push({recipient: recipientNumber, success: false, errorDetail: sendResult.message()});
+        } else {
+            results.push({recipient: recipientNumber, success: true, errorDetail: ()});
+        }
     }
+
+    return results;
 }
 
 function checkAndNotifyInventory() returns error? {
@@ -161,21 +190,29 @@ function checkAndNotifyInventory() returns error? {
             continue;
         }
 
-        // Send SMS alert to all recipients
+        // Send SMS alert to all recipients; collect per-recipient delivery results
         string productName = productInfo.productName;
         int currentInventory = productInfo.inventory;
         io:println("Sending inventory alert | product=\"" + productName +
             "\" sku=" + sku + " inventory=" + currentInventory.toString());
-        error? sendResult = sendInventoryAlert(productInfo);
+        RecipientDeliveryResult[] deliveryResults = sendInventoryAlert(productInfo);
 
-        if sendResult is error {
-            string errorMessage = sendResult.message();
-            io:println("ERROR: Failed to send alert for \"" + productName + "\": " + errorMessage);
-        } else {
-            int recipientCount = twilioRecipientNumbers.length();
-            io:println("Alert sent successfully to " + recipientCount.toString() + " recipient(s)");
+        int successCount = 0;
+        foreach RecipientDeliveryResult result in deliveryResults {
+            if result.success {
+                successCount += 1;
+            } else {
+                string detail = result.errorDetail ?: "unknown error";
+                io:println("ERROR: Failed to send alert to " + result.recipient +
+                    " for \"" + productName + "\": " + detail);
+            }
+        }
 
-            // Update cooldown tracker
+        if successCount > 0 {
+            io:println("Alert sent successfully to " + successCount.toString() + " of " +
+                deliveryResults.length().toString() + " recipient(s)");
+
+            // Update cooldown tracker once at least one recipient received the alert
             decimal currentTime = time:monotonicNow();
             cooldownTracker[sku] = {
                 lastAlertTime: currentTime,

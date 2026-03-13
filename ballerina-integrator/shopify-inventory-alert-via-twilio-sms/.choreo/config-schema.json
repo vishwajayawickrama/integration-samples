@@ -8,31 +8,49 @@
         "shopify_inventory_alert_via_twilio_sms": {
           "type": "object",
           "properties": {
-            "shopifyStoreUrl": {
-              "type": "string",
-              "description": ""
-            },
-            "shopifyAccessToken": {
-              "type": "string",
-              "description": ""
-            },
-            "twilioAccountSid": {
-              "type": "string",
-              "description": ""
-            },
-            "twilioAuthToken": {
-              "type": "string",
-              "description": ""
-            },
-            "twilioFromNumber": {
-              "type": "string",
-              "description": ""
-            },
-            "twilioRecipientNumbers": {
-              "type": "array",
-              "items": {
-                "type": "string"
+            "shopifyConfig": {
+              "type": "object",
+              "properties": {
+                "storeUrl": {
+                  "type": "string"
+                },
+                "accessToken": {
+                  "type": "string"
+                }
               },
+              "additionalProperties": false,
+              "required": [
+                "storeUrl",
+                "accessToken"
+              ],
+              "description": ""
+            },
+            "twilioConfig": {
+              "type": "object",
+              "properties": {
+                "accountSid": {
+                  "type": "string"
+                },
+                "authToken": {
+                  "type": "string"
+                },
+                "fromNumber": {
+                  "type": "string"
+                },
+                "recipientNumbers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "accountSid",
+                "authToken",
+                "fromNumber",
+                "recipientNumbers"
+              ],
               "description": ""
             },
             "inventoryThreshold": {
@@ -50,13 +68,6 @@
               },
               "description": ""
             },
-            "collectionsToMonitor": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              },
-              "description": ""
-            },
             "smsTemplate": {
               "type": "string",
               "description": ""
@@ -68,12 +79,8 @@
           },
           "additionalProperties": false,
           "required": [
-            "shopifyStoreUrl",
-            "shopifyAccessToken",
-            "twilioAccountSid",
-            "twilioAuthToken",
-            "twilioFromNumber",
-            "twilioRecipientNumbers"
+            "shopifyConfig",
+            "twilioConfig"
           ]
         }
       },

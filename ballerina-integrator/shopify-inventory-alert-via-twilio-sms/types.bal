@@ -42,3 +42,10 @@ type ProductInventoryInfo record {
     string sku;
     int inventory;
 };
+
+// Per-recipient SMS delivery result
+type RecipientDeliveryResult record {|
+    string recipient;
+    boolean success;
+    string? errorDetail;
+|};
