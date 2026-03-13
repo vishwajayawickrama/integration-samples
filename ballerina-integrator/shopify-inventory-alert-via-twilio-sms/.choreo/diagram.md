@@ -22,4 +22,3 @@ flowchart TD
     MORESKU -- No --> WAIT
     WAIT --> FETCH
     WAIT --> E([End]):::endNode
-```
