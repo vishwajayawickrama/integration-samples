@@ -67,12 +67,12 @@ The following configurations are required to connect to Shopify and Twilio.
 - `{{threshold}}` - Configured inventory threshold
 
 **Default template:**
-```
+```text
 INVENTORY ALERT: {{product.name}} (ID: {{product.id}}) is low on stock. Current inventory: {{product.inventory}}. SKU: {{product.sku}}. Threshold: {{threshold}}
 ```
 
 **Example output:**
-```
+```text
 INVENTORY ALERT: Blue Denim Jacket (ID: 8194105999407) is low on stock. Current inventory: 3. SKU: BDJ-001. Threshold: 10
 ```
 
