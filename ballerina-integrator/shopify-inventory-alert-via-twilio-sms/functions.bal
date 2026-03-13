@@ -104,8 +104,8 @@ function checkInventoryLevels(Product[] products) returns map<ProductInventoryIn
 }
 
 // Function to check if cooldown period has passed
-function isCooldownExpired(string sku, map<AlertCooldown> cooldownTracker) returns boolean {
-    AlertCooldown? cooldownInfo = cooldownTracker[sku];
+function isCooldownExpired(string key, map<AlertCooldown> cooldownTracker) returns boolean {
+    AlertCooldown? cooldownInfo = cooldownTracker[key];
 
     if cooldownInfo is () {
         return true;
@@ -136,6 +136,16 @@ function formatSmsMessage(ProductInventoryInfo productInfo) returns string {
     return message;
 }
 
+// Returns a masked representation of a phone number for safe logging.
+function maskPhone(string phone) returns string {
+    int len = phone.length();
+    if len <= 4 {
+        return "****";
+    }
+    string maskedPrefix = re `\d`.replaceAll(phone.substring(0, len - 4), "*");
+    return maskedPrefix + phone.substring(len - 4);
+}
+
 // Function to send SMS via Twilio to multiple recipients.
 // Iterates all twilioRecipientNumbers without fail-fast: each createMessage call is made
 // independently so a failure for one recipient does not abort delivery to the rest.
@@ -147,7 +157,7 @@ function sendInventoryAlert(ProductInventoryInfo productInfo) returns RecipientD
 
     foreach string recipientNumber in twilioConfig.recipientNumbers {
         // Skip recipients whose individual cooldown has not yet expired
-        if !isCooldownExpired(recipientNumber, cooldownTracker) {
+        if !isCooldownExpired("recipient:" + recipientNumber + "|sku:" + productInfo.sku, cooldownTracker) {
             continue;
         }
 
@@ -191,7 +201,7 @@ function checkAndNotifyInventory() returns error? {
         ProductInventoryInfo productInfo = lowInventoryProducts.get(sku);
 
         // Check if cooldown period has expired
-        if !isCooldownExpired(sku, cooldownTracker) {
+        if !isCooldownExpired("sku:" + sku, cooldownTracker) {
             continue;
         }
 
@@ -207,14 +217,14 @@ function checkAndNotifyInventory() returns error? {
         foreach RecipientDeliveryResult result in deliveryResults {
             if result.success {
                 successCount += 1;
-                // Track cooldown per recipient so failed recipients remain eligible for retry
-                cooldownTracker[result.recipient] = {
+                // Track cooldown per recipient per SKU so failed recipients remain eligible for retry
+                cooldownTracker["recipient:" + result.recipient + "|sku:" + sku] = {
                     lastAlertTime: currentTime,
                     inventory: currentInventory
                 };
             } else {
                 string detail = result.errorDetail ?: "unknown error";
-                io:println("ERROR: Failed to send alert to " + result.recipient +
+                io:println("ERROR: Failed to send alert to " + maskPhone(result.recipient) +
                     " for \"" + productName + "\": " + detail);
             }
         }
@@ -227,7 +237,7 @@ function checkAndNotifyInventory() returns error? {
         // Set SKU-level cooldown only when all attempted recipients were notified,
         // so the entire SKU is skipped on subsequent polls once fully covered.
         if successCount == deliveryResults.length() && deliveryResults.length() > 0 {
-            cooldownTracker[sku] = {
+            cooldownTracker["sku:" + sku] = {
                 lastAlertTime: currentTime,
                 inventory: currentInventory
             };
