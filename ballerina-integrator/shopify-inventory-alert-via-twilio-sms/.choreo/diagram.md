@@ -1,5 +1,3 @@
-```mermaid
-flowchart TD
     S([Start]):::startNode
     S --> INIT[Initialize Shopify Twilio Clients]:::processNode
     INIT --> FETCH[Fetch Products from Shopify Admin API]:::processNode
