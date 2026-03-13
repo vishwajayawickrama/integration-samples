@@ -146,6 +146,11 @@ function sendInventoryAlert(ProductInventoryInfo productInfo) returns RecipientD
     RecipientDeliveryResult[] results = [];
 
     foreach string recipientNumber in twilioConfig.recipientNumbers {
+        // Skip recipients whose individual cooldown has not yet expired
+        if !isCooldownExpired(recipientNumber, cooldownTracker) {
+            continue;
+        }
+
         twilio:CreateMessageRequest messageRequest = {
             To: recipientNumber,
             From: twilioConfig.fromNumber,
@@ -198,9 +203,15 @@ function checkAndNotifyInventory() returns error? {
         RecipientDeliveryResult[] deliveryResults = sendInventoryAlert(productInfo);
 
         int successCount = 0;
+        decimal currentTime = time:monotonicNow();
         foreach RecipientDeliveryResult result in deliveryResults {
             if result.success {
                 successCount += 1;
+                // Track cooldown per recipient so failed recipients remain eligible for retry
+                cooldownTracker[result.recipient] = {
+                    lastAlertTime: currentTime,
+                    inventory: currentInventory
+                };
             } else {
                 string detail = result.errorDetail ?: "unknown error";
                 io:println("ERROR: Failed to send alert to " + result.recipient +
@@ -211,9 +222,11 @@ function checkAndNotifyInventory() returns error? {
         if successCount > 0 {
             io:println("Alert sent successfully to " + successCount.toString() + " of " +
                 deliveryResults.length().toString() + " recipient(s)");
+        }
 
-            // Update cooldown tracker once at least one recipient received the alert
-            decimal currentTime = time:monotonicNow();
+        // Set SKU-level cooldown only when all attempted recipients were notified,
+        // so the entire SKU is skipped on subsequent polls once fully covered.
+        if successCount == deliveryResults.length() && deliveryResults.length() > 0 {
             cooldownTracker[sku] = {
                 lastAlertTime: currentTime,
                 inventory: currentInventory
