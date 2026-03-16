@@ -16,12 +16,16 @@
                 },
                 "accessToken": {
                   "type": "string"
+                },
+                "apiSecretKey": {
+                  "type": "string"
                 }
               },
               "additionalProperties": false,
               "required": [
                 "storeUrl",
-                "accessToken"
+                "accessToken",
+                "apiSecretKey"
               ],
               "description": ""
             },
@@ -55,17 +59,6 @@
             },
             "inventoryThreshold": {
               "type": "integer",
-              "description": ""
-            },
-            "pollingIntervalSeconds": {
-              "type": "number",
-              "description": ""
-            },
-            "productIdsToMonitor": {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              },
               "description": ""
             },
             "smsTemplate": {

@@ -1,7 +1,6 @@
 ## What It Does
 
-- Polls your Shopify store at a configurable interval to check inventory levels across products
-- Filters monitoring to specific product IDs or watches all products in the store
+- Listens for new Shopify orders via webhook and checks the inventory of each ordered product variant
 - Sends an SMS alert via Twilio to one or more recipient numbers when a product's inventory drops below the configured threshold
 - Suppresses repeat alerts for the same SKU until a configurable cooldown period expires
 - Supports a customisable SMS message template with product and inventory placeholders
@@ -21,9 +20,12 @@
     - Go to the **API credentials** tab and click **Install app**
     - Copy the **Admin API access token** — this is your `accessToken`
     - > **Note:** The token is shown only once. Store it securely.
-3. **Find product IDs to monitor** — open a product in Shopify Admin; the numeric ID is at the end of the URL:
-    - `https://admin.shopify.com/store/<your-store>/products/<productId>`
-    - Set these IDs in `productIdsToMonitor`. Leave the array empty (`[]`) to monitor all products.
+3. **Register a webhook for order creation**
+    - In Shopify Admin, go to **Settings → Notifications → Webhooks**
+    - Click **Create webhook**
+    - Set **Event** to `Order creation`, **Format** to `JSON`
+    - Set **URL** to the public URL of this deployed integration (e.g., `https://<your-host>/shopify`)
+    - Copy the **Signing secret** — set this as `apiSecretKey`
 
 </details>
 
@@ -48,17 +50,13 @@
 
 <summary>Additional Configurations</summary>
 
-1. `pollingIntervalSeconds`
-    - How often (in seconds) the integration checks Shopify inventory (default: `300`)
-2. `inventoryThreshold`
-    - An alert is sent when a product's inventory falls below this number (default: `10`)
-3. `productIdsToMonitor`
-    - Array of Shopify product IDs to watch. Leave empty (`[]`) to monitor all products.
-4. `recipientNumbers`
+1. `inventoryThreshold`
+    - An alert is sent when an ordered product's inventory falls below this number (default: `10`)
+2. `recipientNumbers`
     - Array of recipient phone numbers in E.164 format (e.g., `["+94711234567"]`)
-5. `cooldownPeriodHours`
+3. `cooldownPeriodHours`
     - Minimum hours between repeat alerts for the same SKU (default: `24`)
-6. `smsTemplate`
+4. `smsTemplate`
     - Customisable SMS message template. Available placeholders:
         - `{{product.id}}` — Shopify product ID
         - `{{product.name}}` — Product name
