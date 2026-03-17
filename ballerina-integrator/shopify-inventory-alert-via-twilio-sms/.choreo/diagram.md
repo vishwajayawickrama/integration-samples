@@ -1,11 +1,8 @@
-    S([Order Created in Shopify]):::startNode
-    S --> WEBHOOK[Webhook Received by onOrdersCreate]:::processNode
-    WEBHOOK --> EXTRACT[Extract Line Items from Order]:::processNode
-    EXTRACT --> FETCH[Fetch Current Inventory from Shopify Admin API]:::processNode
-    FETCH --> CHECK{Inventory Below Threshold?}:::decisionNode
-    CHECK -- No --> SKIP[Skip - Stock is Sufficient]:::processNode
+    S([Start]):::startNode
+    S --> WEBHOOK[Receive Shopify Order Webhook]:::processNode
+    WEBHOOK --> CHECK{Inventory Below Threshold?}:::decisionNode
+    CHECK -- No --> E([End]):::endNode
     CHECK -- Yes --> COOLDOWN{Cooldown Expired?}:::decisionNode
-    COOLDOWN -- No --> SKIP
+    COOLDOWN -- No --> E
     COOLDOWN -- Yes --> SEND[Send SMS Alert via Twilio]:::processNode
-    SEND --> E([End]):::endNode
-    SKIP --> E
+    SEND --> E

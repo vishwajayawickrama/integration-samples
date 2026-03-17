@@ -1,6 +1,7 @@
 ## What It Does
 
-- Listens for new Shopify orders via webhook and checks the inventory of each ordered product variant
+- Receives a real-time webhook from Shopify whenever a new order is created
+- Checks the current inventory level of each product variant in the order against a configurable threshold
 - Sends an SMS alert via Twilio to one or more recipient numbers when a product's inventory drops below the configured threshold
 - Suppresses repeat alerts for the same SKU until a configurable cooldown period expires
 - Supports a customisable SMS message template with product and inventory placeholders
@@ -17,15 +18,17 @@
     - Click **Create an app** and give it a name (e.g., `Inventory Monitor`)
     - Under the **Configuration** tab, click **Configure Admin API scopes** and enable:
         - `read_products`
+        - `read_inventory`
     - Go to the **API credentials** tab and click **Install app**
     - Copy the **Admin API access token** — this is your `accessToken`
     - > **Note:** The token is shown only once. Store it securely.
-3. **Register a webhook for order creation**
+3. **Get the webhook signing secret and register a webhook**
     - In Shopify Admin, go to **Settings → Notifications → Webhooks**
-    - Click **Create webhook**
-    - Set **Event** to `Order creation`, **Format** to `JSON`
-    - Set **URL** to the public URL of this deployed integration (e.g., `https://<your-host>/shopify`)
-    - Copy the **Signing secret** — set this as `apiSecretKey`
+    - Copy the secret shown under _"Your webhooks will be signed with"_ — this is your `apiSecretKey`
+    - Click **Create webhook** and configure:
+        - **Event**: `Order creation`
+        - **Format**: `JSON`
+        - **URL**: the public endpoint URL of this deployed integration
 
 </details>
 
