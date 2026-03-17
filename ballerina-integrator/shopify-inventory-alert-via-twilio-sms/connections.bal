@@ -1,12 +1,8 @@
-import ballerinax/trigger.shopify;
+import ballerina/http;
 import ballerinax/shopify.admin;
 import ballerinax/twilio;
 
-shopify:ListenerConfig listenerConfig = {
-    apiSecretKey: shopifyConfig.apiSecretKey
-};
-
-listener shopify:Listener shopifyListener = new (listenerConfig, 8090);
+listener http:Listener httpListener = new (8090);
 
 // Twilio client
 final twilio:Client twilioClient = check new ({

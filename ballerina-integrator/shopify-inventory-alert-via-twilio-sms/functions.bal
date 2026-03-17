@@ -1,6 +1,5 @@
 import ballerina/log;
 import ballerina/time;
-import ballerinax/trigger.shopify;
 import ballerinax/shopify.admin;
 import ballerinax/twilio;
 
@@ -43,8 +42,8 @@ function getProductInventory(int productId) returns map<ProductInventoryInfo>|er
 
 // Process line items from a new Shopify order: for each ordered product variant,
 // fetch current inventory and send an SMS alert if below the threshold.
-function processOrderedLineItems(shopify:LineItem[] lineItems) returns error? {
-    foreach shopify:LineItem lineItem in lineItems {
+function processOrderedLineItems(LineItemInfo[] lineItems) returns error? {
+    foreach LineItemInfo lineItem in lineItems {
         int productId = lineItem?.product_id ?: 0;
         int variantId = lineItem?.variant_id ?: 0;
         if productId == 0 || variantId == 0 {
