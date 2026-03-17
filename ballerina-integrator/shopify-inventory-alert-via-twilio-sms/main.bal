@@ -18,8 +18,8 @@ service shopify:OrdersService on shopifyListener {
         int orderId = event?.id ?: 0;
         log:printInfo("Trigger fired: new Shopify order received", orderId = orderId);
 
-        shopify:LineItem[]? lineItems = event?.line_items;
-        if lineItems is () || lineItems.length() == 0 {
+        OrderLineItem[] lineItems = extractOrderLineItems(event);
+        if lineItems.length() == 0 {
             log:printInfo("No line items found in order", orderId = orderId);
             return;
         }

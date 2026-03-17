@@ -1,3 +1,9 @@
+// Custom line item type - only the fields needed for inventory checks
+type OrderLineItem record {
+    int productId;
+    int variantId;
+};
+
 // Cooldown tracking record
 type AlertCooldown record {
     decimal lastAlertTime;

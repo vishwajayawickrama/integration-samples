@@ -41,12 +41,28 @@ function getProductInventory(int productId) returns map<ProductInventoryInfo>|er
     return variantInventory;
 }
 
+// Extracts only the product/variant IDs needed for inventory checks from a Shopify order event.
+function extractOrderLineItems(shopify:OrderEvent event) returns OrderLineItem[] {
+    OrderLineItem[] lineItems = [];
+    shopify:LineItem[]? items = event?.line_items;
+    if items is shopify:LineItem[] {
+        foreach shopify:LineItem item in items {
+            int productId = item?.product_id ?: 0;
+            int variantId = item?.variant_id ?: 0;
+            if productId != 0 && variantId != 0 {
+                lineItems.push({productId, variantId});
+            }
+        }
+    }
+    return lineItems;
+}
+
 // Process line items from a new Shopify order: for each ordered product variant,
 // fetch current inventory and send an SMS alert if below the threshold.
-function processOrderedLineItems(shopify:LineItem[] lineItems) returns error? {
-    foreach shopify:LineItem lineItem in lineItems {
-        int productId = lineItem?.product_id ?: 0;
-        int variantId = lineItem?.variant_id ?: 0;
+function processOrderedLineItems(OrderLineItem[] lineItems) returns error? {
+    foreach OrderLineItem lineItem in lineItems {
+        int productId = lineItem.productId;
+        int variantId = lineItem.variantId;
         if productId == 0 || variantId == 0 {
             continue;
         }
