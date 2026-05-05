@@ -329,6 +329,94 @@
       "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Transformation_Templates.png",
       "tags": ["Integration", "HTTP", "REST"],
       "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Hello World Service",
+      "description": "This sample demonstrates a simple HTTP service.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/HelloWorldService",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Hello_World.png",
+      "tags": ["Integration", "HTTP", "REST"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Proxying a REST Service",
+      "description": "This sample exposes a virtual service, which acts as a proxy to an existing RESTful service.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/ProxyingaRESTService",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Routing_Templates.png",
+      "tags": ["Integration", "HTTP", "REST"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Proxying a SOAP Service",
+      "description": "This sample exposes a virtual service, which acts as a proxy to an existing SOAP service.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/ProxyingaSOAPService",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Routing_Templates.png",
+      "tags": ["Integration", "SOAP"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "REST to SOAP Conversion",
+      "description": "This sample exposes an existing SOAP service as a RESTful API.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/RESTtoSOAPConversion",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Transformation_Templates.png",
+      "tags": ["Integration", "REST", "SOAP"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Scatter Gather Integration Pattern",
+      "description": "This sample demonstrates how to implement the Scatter Gather messaging pattern.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/ScatterGatherIntegrationPattern",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Routing_Templates.png",
+      "tags": ["Integration", "HTTP", "REST"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Students Data Service",
+      "description": "This sample demonstrates a SOAP data service.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/StudentsDataService",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/DataIntegration_Templates.png",
+      "tags": ["Integration", "SOAP", "Database"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Synapse Expressions",
+      "description": "This sample demonstrates the usage of Synapse Expressions in WSO2 Micro Integrator.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/SynapseExpressions",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Hello_World.png",
+      "tags": ["Integration", "HTTP", "REST"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
+    },
+    {
+      "displayName": "Unit Test Tutorial",
+      "description": "This sample demonstrates the Unit Testing capabilities of WSO2 Integrator: MI.",
+      "componentType": "service",
+      "buildPack": "wso2-mi",
+      "repositoryUrl": "https://github.com/wso2/integration-samples/",
+      "componentPath": "/integrator-mi-profile/UnitTestTutorial",
+      "thumbnailPath": "https://mi-connectors.wso2.com/samples/icons/Testing_Templates.png",
+      "tags": ["Integration", "HTTP", "REST"],
+      "imageUrl": "choreoanonymouspullable.azurecr.io/samples/reading-list-rest-service-in-go:1.0.0"
     }
   ]
 }
